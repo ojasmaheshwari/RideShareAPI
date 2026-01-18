@@ -1,6 +1,5 @@
 package com.epicman.rideshare.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,29 +16,30 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return  authenticationConfiguration.getAuthenticationManager();
-    }
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+			throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter filter) throws Exception {
-        http.csrf( crsf -> crsf.disable() ).authorizeHttpRequests( auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated()
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter filter) throws Exception {
+		http.csrf(crsf -> crsf.disable()).authorizeHttpRequests(auth -> auth
+				.requestMatchers("/api/auth/**").permitAll()
+				.requestMatchers("/").permitAll()
+				.anyRequest().authenticated()
 
-        ).headers(headers -> headers
-                .frameOptions( frame -> frame.sameOrigin())
-        ).sessionManagement( sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		).headers(headers -> headers
+				.frameOptions(frame -> frame.sameOrigin())).sessionManagement(
+						sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+		return http.build();
+	}
 }

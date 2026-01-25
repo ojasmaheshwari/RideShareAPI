@@ -32,6 +32,11 @@ public class SecurityConfig {
 		http.csrf(crsf -> crsf.disable()).authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/auth/**").permitAll()
 				.requestMatchers("/").permitAll()
+				// Swagger/OpenAPI endpoints
+				.requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
+				.requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
+				.requestMatchers("/swagger-resources/**").permitAll()
+				.requestMatchers("/webjars/**").permitAll()
 				.anyRequest().authenticated()
 
 		).headers(headers -> headers

@@ -6,6 +6,7 @@ import com.epicman.rideshare.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,10 @@ public class UserService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    @CachePut(value = "users", key = "#result.username")
+    @Caching(put = {
+            @CachePut(value = "users", key = "#result.username"),
+            @CachePut(value = "users_id", key = "#result.id")
+    })
     public UserModel create(UserModel userModel) {
         return userRepository.save(userModel);
     }
@@ -37,12 +41,16 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User not found: " + username));
     }
 
+    @Cacheable(value = "users_id", key = "#id")
     public UserModel findById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
     }
 
-    @CachePut(value = "users", key = "#result.username")
+    @Caching(put = {
+            @CachePut(value = "users", key = "#result.username"),
+            @CachePut(value = "users_id", key = "#result.id")
+    })
     public UserModel registerUser(String username, String password, String role,
             MultipartFile file) throws ConflictException, IOException {
         if (userRepository.findByUsername(username).isPresent()) {
@@ -62,7 +70,10 @@ public class UserService {
         return userRepository.save(userModel);
     }
 
-    @CachePut(value = "users", key = "#result.username")
+    @Caching(put = {
+            @CachePut(value = "users", key = "#result.username"),
+            @CachePut(value = "users_id", key = "#result.id")
+    })
     public UserModel updateProfilePicture(String userId, MultipartFile file)
             throws IOException {
         UserModel userModel = findById(userId);
